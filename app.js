@@ -18,8 +18,10 @@ mongoose
   });
 
 const userRoutes = require("./src/routes/user.route");
+const customerRoutes = require("./src/routes/customer.route");
 
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/customers" , customerRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);
