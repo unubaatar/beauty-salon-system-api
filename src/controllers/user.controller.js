@@ -49,3 +49,31 @@ exports.login = async(req , res , next) => {
     next(err);
   }
 }
+
+exports.update = async(req , res , next) => {
+  try {
+    const { _id , ...body } = req.body;
+    const user = await User.findByIdAndUpdate(_id , body);
+    if(!user) {
+      return res.status(404).json({message: "User not found"});
+    }
+    return res.status(200).json(user);
+  } catch(err) {
+    console.log(err);
+    next(err);
+  }
+}
+
+exports.list = async(req , res , next) => {
+  try {
+    const { per_page = 10 , page = 1 , filter } = req.body;
+    const query = {};
+    const count = await User.countDocuments({});
+    const users = await User.find(query)
+      .skip((page - 1) * per_page)
+      .limit(per_page)
+    return res.status(200).json({ count: count , rows: users });
+  } catch(err) {
+    next(err);
+  }
+}
