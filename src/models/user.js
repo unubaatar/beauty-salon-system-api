@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const defaultImage = "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
 
 const userSchema = new Schema(
   {
@@ -29,15 +30,16 @@ const userSchema = new Schema(
       default: true,
     },
     isApproved: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false
     },
     password: {
       type: String,
       required: true,
     },
     avatar: {
-      type: String
+      type: String,
+      default: defaultImage
     },
     role: {
       type: String,

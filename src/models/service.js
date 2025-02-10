@@ -13,7 +13,6 @@ const serviceSchema = new Schema(
     },
     body: {
       type: String,
-      required: true,
     },
     price: {
       type: Number,

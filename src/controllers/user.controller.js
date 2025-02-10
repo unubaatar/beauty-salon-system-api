@@ -27,28 +27,29 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.login = async(req , res , next) => {
+exports.login = async (req, res, next) => {
   try {
-    const { phone , password } = req.body;
+    const { phone, password } = req.body;
 
-    if(!phone || !password) {
+    if (!phone || !password) {
       return res.status(400).json({ message: "Insert all fields" });
     }
 
-    const foundUser = await User.findOne({ phone: phone });
-    if(!foundUser) {
+    const foundUser = await User.findOne({ phone: phone })
+    if (!foundUser) {
       return res.status(400).json({ message: "User not found" });
     }
 
     const isMatch = await foundUser.comparePassword(password);
-    if(!isMatch) {
+    if (!isMatch) {
       return res.status(400).json({ message: "Password not match" });
     }
-    return res.status(200).json({ user: foundUser._id.toString() });
-  } catch(err) {
+
+    return res.status(200).json({ user: foundUser }); 
+  } catch (err) {
     next(err);
   }
-}
+};
 
 exports.update = async(req , res , next) => {
   try {
@@ -74,6 +75,28 @@ exports.list = async(req , res , next) => {
       .limit(per_page)
     return res.status(200).json({ count: count , rows: users });
   } catch(err) {
+    console.log(err);
+    next(err);
+  }
+}
+
+exports.all = async(req , res , next) => {
+  try {
+    const count = await User.countDocuments({});
+    const users = await User.find({});
+    return res.status(200).json({ count: count , rows: users });
+  } catch(err) {
+    console.log(err);
+    next(err);
+  }
+}
+
+exports.getWorkers = async(req , res , next) => {
+  try {
+    const users = await User.find({ role: "worker" });
+    return res.status(200).json(users);
+  } catch(err) {
+    console.log(err);
     next(err);
   }
 }
