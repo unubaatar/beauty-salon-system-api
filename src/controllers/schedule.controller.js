@@ -13,7 +13,6 @@ exports.create = async (req, res, next) => {
       return res.status(404).json({ message: "Insert all required fields" });
     }
     const foundSchedule = await Schedule.findOne({ dateTitle: dateTitle , worker: worker , day : day });
-    console.log(foundSchedule);
     if(foundSchedule) {
       return res.status(404).json({ message: "Already scheduled" });
     }
@@ -101,12 +100,6 @@ exports.getScheduleByWeek = async (req, res, next) => {
     for (let schedule of schedules) {
       const { dateTitle, worker, totalSum, totalService , _id } = schedule;
       let dayGroup = scheduleByDay.find(item => item.dateTitle === dateTitle);
-
-      // if (!dayGroup) {
-      //   dayGroup = { dateTitle, schedules: [] };
-      //   scheduleByDay.push(dayGroup);
-      // }
-
       dayGroup.schedules.push({
         _id,
         worker,
@@ -135,3 +128,27 @@ exports.delete = async(req , res , next) => {
     next(err);
   }
 }
+
+exports.getByDate = async(req , res , next) => {
+  try {
+      const { dateTitle } = req.body;
+      const timeRequests = await Schedule.find({ dateTitle:dateTitle }).populate(
+        {
+          path: "timeRequests",
+          match: { state: { $ne: "free" } },
+          populate: {
+            path: "customer service"
+          }
+        }
+      )
+      .populate({
+          path: "worker",
+          select: "avatar firstName lastName role"
+      });
+      return res.status(200).json(timeRequests);
+  } catch(err) {
+      console.log(err);
+      next(err);
+  }
+}
+

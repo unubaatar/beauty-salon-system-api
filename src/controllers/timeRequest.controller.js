@@ -25,30 +25,11 @@ exports.reserve = async(req , res , next) => {
         reservedTimeRequest.state = "reserved";
         await reservedTimeRequest.save();
         const reservedSchedule = await Schedule.findById(reservedTimeRequest.schedule);
-        console.log(reservedSchedule)
         reservedSchedule.totalService += 1;
-        console.log(reservedSchedule.totalService);
         await reservedSchedule.save();
         return res.status(200).json(reservedTimeRequest);
     } catch(err) {
         console.log(err);
         next(err);
-    }
-}
-
-exports.getByDate = async(req , res , next) => {
-    try {
-        const { date } = req.body;
-    } catch(err) {
-        console.log(err);
-        next(err);
-    }
-}
-
-exports.getByServiceAndWorker = async(req , res , next) => {
-    try {
-
-    } catch(err) {
-        console.log(err);
     }
 }
