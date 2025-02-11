@@ -8,6 +8,10 @@ const scheduleSchema = new Schema({
         required: true
     },
     date: {
+        type: Date,
+        required: true
+    },
+    dateTitle: {
         type: String ,
         required: true
     },
