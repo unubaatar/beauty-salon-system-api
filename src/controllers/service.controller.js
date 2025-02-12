@@ -3,7 +3,7 @@ const Service = require("../models/service");
 
 exports.create = async(req , res , next) => {
     try {
-        const { title ,  description , body  , price , image , workers} = req.body;
+        const { title ,  description , body  , price , image , workers , duration } = req.body;
         if(!title || !description  ||  !price ) {
             return res.status(404).json({ message: "Set all fields" });
         };

@@ -25,6 +25,10 @@ const serviceSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    duration: {
+      type: Number,
+      required: true
+    },
     workers: [
       {
         type: Schema.Types.ObjectId,

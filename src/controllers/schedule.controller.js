@@ -1,14 +1,13 @@
 const User = require("../models/user");
 const Schedule = require("../models/schedule");
 const TimeRequest = require("../models/timeRequest");
-const timeRequests = require("../constants/timeRequests");
+const possibleTimes = require("../constants/possibleTimes");
 const DAYS = require("../constants/days");
 const moment = require("moment");
 
 exports.create = async (req, res, next) => {
   try {
     const { dateTitle, worker, day } = req.body;
-    console.log(req.body);
     if (!dateTitle || !worker || !day) {
       return res.status(404).json({ message: "Insert all required fields" });
     }
@@ -20,7 +19,7 @@ exports.create = async (req, res, next) => {
     const newSchedule = new Schedule({ dateTitle, worker, day , date });
     await newSchedule.save();
 
-    const timeRequestDocs = timeRequests.map((timeReq) => ({
+    const timeRequestDocs = possibleTimes.map((timeReq) => ({
       time: timeReq,
       schedule: newSchedule._id,
     }));
@@ -98,13 +97,13 @@ exports.getScheduleByWeek = async (req, res, next) => {
     );
 
     for (let schedule of schedules) {
-      const { dateTitle, worker, totalSum, totalService , _id } = schedule;
+      const { dateTitle, worker, totalIncome, totalServices , _id } = schedule;
       let dayGroup = scheduleByDay.find(item => item.dateTitle === dateTitle);
       dayGroup.schedules.push({
         _id,
         worker,
-        totalSum,
-        totalService
+        totalIncome,
+        totalServices
       });
     }
 
@@ -126,29 +125,6 @@ exports.delete = async(req , res , next) => {
   } catch(err) {
     console.log(err);
     next(err);
-  }
-}
-
-exports.getByDate = async(req , res , next) => {
-  try {
-      const { dateTitle } = req.body;
-      const timeRequests = await Schedule.find({ dateTitle:dateTitle }).populate(
-        {
-          path: "timeRequests",
-          match: { state: { $ne: "free" } },
-          populate: {
-            path: "customer service"
-          }
-        }
-      )
-      .populate({
-          path: "worker",
-          select: "avatar firstName lastName role"
-      });
-      return res.status(200).json(timeRequests);
-  } catch(err) {
-      console.log(err);
-      next(err);
   }
 }
 

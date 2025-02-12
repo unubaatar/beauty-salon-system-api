@@ -25,11 +25,11 @@ const scheduleSchema = new Schema({
         type: String,
         required: true
     },
-    totalSum: {
+    totalIncome: {
         type: Number,
         default: 0
     },
-    totalService: {
+    totalServices: {
         type: Number,
         default: 0
     },
