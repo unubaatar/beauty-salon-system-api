@@ -21,6 +21,12 @@ const scheduleSchema = new Schema({
             ref: "TimeRequest"
         }
     ],
+    timeReserves: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "TimeReserve"
+        }
+    ],
     day: {
         type: String,
         required: true

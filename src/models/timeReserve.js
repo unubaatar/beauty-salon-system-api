@@ -20,7 +20,11 @@ const timeReserveSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Schedule",
         required: true,
-      },
+    },
+    dateTitle: {
+        type: String,
+        required: true
+    },
     startTime: {
         type: String,
         required: true

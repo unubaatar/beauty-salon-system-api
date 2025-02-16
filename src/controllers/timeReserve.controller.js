@@ -60,14 +60,19 @@ exports.create = async(req , res , next) => {
             endDate: endDate,
             startTime: startTime,
             totalDuration: totalDuration,
-            totalAmount: totalAmount
+            totalAmount: totalAmount,
+            dateTitle: foundSchedule.dateTitle
         };
 
         const newTimeReserve = new TimeReserve(params);
         await newTimeReserve.save();
+
+        foundSchedule.timeReserves.push(newTimeReserve);
+        await foundSchedule.save();
         return res.status(200).json(newTimeReserve);
     } catch(err) {
         console.log(err);
         next(err);
     }
 }
+

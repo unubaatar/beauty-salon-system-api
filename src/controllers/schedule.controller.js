@@ -11,12 +11,16 @@ exports.create = async (req, res, next) => {
     if (!dateTitle || !worker || !day) {
       return res.status(404).json({ message: "Insert all required fields" });
     }
-    const foundSchedule = await Schedule.findOne({ dateTitle: dateTitle , worker: worker , day : day });
-    if(foundSchedule) {
+    const foundSchedule = await Schedule.findOne({
+      dateTitle: dateTitle,
+      worker: worker,
+      day: day,
+    });
+    if (foundSchedule) {
       return res.status(404).json({ message: "Already scheduled" });
     }
     const date = new Date(dateTitle);
-    const newSchedule = new Schedule({ dateTitle, worker, day , date });
+    const newSchedule = new Schedule({ dateTitle, worker, day, date });
     await newSchedule.save();
 
     const timeRequestDocs = possibleTimes.map((timeReq) => ({
@@ -60,71 +64,99 @@ exports.list = async (req, res, next) => {
 exports.getScheduleByWeek = async (req, res, next) => {
   try {
     const { dates } = req.body;
-    const startDate = moment(dates[0]).startOf('day').toDate();
-    const endDate = moment(dates[1]).endOf('day').toDate();
+    const startDate = moment(dates[0]).startOf("day").toDate();
+    const endDate = moment(dates[1]).endOf("day").toDate();
     const allDates = [];
     let currentDate = moment(startDate);
     while (currentDate <= moment(endDate)) {
-      allDates.push(currentDate.format('YYYY-MM-DD'));
-      currentDate = currentDate.add(1, 'days');
+      allDates.push(currentDate.format("YYYY-MM-DD"));
+      currentDate = currentDate.add(1, "days");
     }
 
     let scheduleByDay = [];
 
     for (let date of allDates) {
-        scheduleByDay.push({
-          dateTitle: date,
-          schedules: []
-        });
+      scheduleByDay.push({
+        dateTitle: date,
+        schedules: [],
+      });
     }
 
-    for(let i = 0 ; i < DAYS.length ; i++) {
-      scheduleByDay[i].day = DAYS[i]; 
+    for (let i = 0; i < DAYS.length; i++) {
+      scheduleByDay[i].day = DAYS[i];
     }
 
     const query = {
       date: {
         $gte: startDate,
         $lte: endDate,
-      }
+      },
     };
 
-    const schedules = await Schedule.find(query).select("-timeRequests").populate(
-      {
+    const schedules = await Schedule.find(query)
+      .select("-timeRequests")
+      .populate({
         path: "worker",
-        select: "firstName lastName role avatar"
-      }
-    );
+        select: "firstName lastName role avatar",
+      });
 
     for (let schedule of schedules) {
-      const { dateTitle, worker, totalIncome, totalServices , _id } = schedule;
-      let dayGroup = scheduleByDay.find(item => item.dateTitle === dateTitle);
+      const { dateTitle, worker, totalIncome, totalServices, _id } = schedule;
+      let dayGroup = scheduleByDay.find((item) => item.dateTitle === dateTitle);
       dayGroup.schedules.push({
         _id,
         worker,
         totalIncome,
-        totalServices
+        totalServices,
       });
     }
 
-    return res.status(200).json( scheduleByDay );
-  } catch (err) {
-
-  }
+    return res.status(200).json(scheduleByDay);
+  } catch (err) {}
 };
 
-exports.delete = async(req , res , next) => {
+exports.delete = async (req, res, next) => {
   try {
     const { _id } = req.body;
     const deletedSchedule = await Schedule.findByIdAndDelete(_id);
-    if(!deletedSchedule) {
+    if (!deletedSchedule) {
       return res.status(404).json({ message: "Not found" });
     }
     await TimeRequest.deleteMany({ schedule: _id });
     return res.status(200).json({ message: "Deleted successfully" });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     next(err);
   }
-}
+};
 
+exports.getByDate = async (req, res, next) => {
+  try {
+    const { dateTitle } = req.body;
+    const schedules = await Schedule.find({ dateTitle: dateTitle })
+      .select("-timeRequests")
+      .populate({
+        path: "worker",
+        select: "firstName lastName phone avatar"
+      })
+      .populate(
+        {
+          path: "timeReserves",
+          populate: [
+            {
+              path: "services",
+              select: "title price",
+            },
+            {
+              path: "customer",
+              select: "firstName lastName phone",
+            }
+          ]
+        }
+      );
+    return res.status(200).json(schedules);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
