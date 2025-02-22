@@ -44,7 +44,7 @@ exports.create = async (req, res, next) => {
       if(!isMatch) {
         return res.status(400).json({ message: "Password not match" });
       }
-      return res.status(200).json({ user: foundCustomer._id.toString() });
+      return res.status(200).json({ customer: foundCustomer._id.toString() });
     } catch(err) {
       next(err);
     }
