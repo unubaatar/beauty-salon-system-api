@@ -35,6 +35,10 @@ const serviceSchema = new Schema(
         ref: "User",
       },
     ],
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "ServiceCategory"
+    }
   },
   {
     timestamps: true,

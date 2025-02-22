@@ -23,13 +23,15 @@ const serviceRoutes = require("./src/routes/service.route");
 const timeRequestRoutes = require("./src/routes/timeRequest.route");
 const scheduleRoutes = require("./src/routes/schedule.route");
 const timeReserveRoutes = require("./src/routes/timeReserve.route");
+const serviceCategoryRoutes = require("./src/routes/serviceCategory.route");
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/customers" , customerRoutes);
 app.use("/api/v1/services" , serviceRoutes);
 app.use("/api/v1/schedules" , scheduleRoutes);
 app.use("/api/v1/timeRequests" , timeRequestRoutes);
-app.use("/api/v1/timeReserves" , timeReserveRoutes)
+app.use("/api/v1/timeReserves" , timeReserveRoutes);
+app.use("/api/v1/serviceCategories" , serviceCategoryRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);
