@@ -32,12 +32,16 @@ exports.update = async(req , res , next) => {
 
 exports.list = async(req , res , next) => {
     try {
-        const { page = 1 , per_page = 10 , filter } = req.body; 
+        const { filter } = req.body; 
         const query = {};
+        if(filter && filter.category) {
+            query.category = filter.category;
+        };
+        console.log(query);
         const count = await Service.countDocuments({});
         const services = await Service.find(query)
-            .skip((page - 1 ) * per_page)
-            .limit(per_page)
+            // .skip((page - 1 ) * per_page)
+            // .limit(per_page)
             .populate("workers category")
         return res.status(200).json({ count: count , rows: services });
     } catch(err) {
@@ -58,3 +62,40 @@ exports.all = async(req , res , next) => {
     }
 }
 
+exports.getWorkerByService = async (req, res, next) => {
+    try {
+        const { services } = req.body;
+
+        const foundServices = await Service.find({ _id: { $in: services } }).populate('workers');
+
+        let allWorkers = [];
+
+        foundServices.forEach(service => {
+            service.workers.forEach(worker => {
+                if (!allWorkers.some(existingWorker => existingWorker.id === worker.id)) {
+                    allWorkers.push(worker);
+                }
+            });
+        });
+        
+
+        let uniqueWorkers = [];
+
+        for(let worker of allWorkers ) {
+            let count = 0;
+            for(let service of foundServices) {
+                if(service.workers.some( serviceWorker => serviceWorker._id == worker._id )) {
+                    count++;
+                }
+            };
+            if(count == foundServices.length) {
+                uniqueWorkers.push(worker);
+            }
+        }
+
+        return res.status(200).json(uniqueWorkers );
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
+};

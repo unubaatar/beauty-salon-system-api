@@ -6,5 +6,6 @@ router.post("/create" , serviceControllers.create);
 router.post("/update" , serviceControllers.update);
 router.post("/list" , serviceControllers.list);
 router.post("/all" , serviceControllers.all);
+router.post("/getWorkerByService" , serviceControllers.getWorkerByService);
 
 module.exports = router;
