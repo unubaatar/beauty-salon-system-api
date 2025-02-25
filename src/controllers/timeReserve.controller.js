@@ -42,7 +42,7 @@ exports.create = async(req , res , next) => {
             }
         }
 
-        for(let i = startSection ; i <= endSection ; i++) {
+        for(let i = startSection ; i < endSection ; i++) {
             foundSchedule.timeRequests[i].hasReserved = true;
             await foundSchedule.timeRequests[i].save();
         }

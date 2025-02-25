@@ -160,3 +160,12 @@ exports.getByDate = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getByWorker = async(req , res , next) => {
+  try {
+    
+  } catch(err) {
+    console.log(err);
+    next(err);
+  }
+}
