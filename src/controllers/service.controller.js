@@ -30,6 +30,20 @@ exports.update = async(req , res , next) => {
     }
 }
 
+exports.getById = async(req , res , next) => {
+    try {
+        const { _id } = req.body;
+        const service = await Service.findById(_id).populate("variants workers");
+        if(!service) {
+            return res.status(404).json({ message: "Service not found" });
+        }
+        return res.status(200).json(service);
+    } catch(err) {
+        console.log(err);
+        next(err);
+    }
+}
+
 exports.list = async(req , res , next) => {
     try {
         const { filter } = req.body; 
@@ -37,7 +51,6 @@ exports.list = async(req , res , next) => {
         if(filter && filter.category) {
             query.category = filter.category;
         };
-        console.log(query);
         const count = await Service.countDocuments({});
         const services = await Service.find(query)
             // .skip((page - 1 ) * per_page)

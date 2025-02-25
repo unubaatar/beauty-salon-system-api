@@ -38,7 +38,13 @@ const serviceSchema = new Schema(
     category: {
       type: Schema.Types.ObjectId,
       ref: "ServiceCategory"
-    }
+    },
+    variants: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ServiceVariant"
+      }
+    ]
   },
   {
     timestamps: true,
