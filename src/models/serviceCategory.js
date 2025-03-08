@@ -11,6 +11,10 @@ const serviceCategorySchema = new Schema(
       type: String,
       default: "",
     },
+    image: {
+      type: String,
+      required: true
+    }
   },
   {
     timestamps: true,

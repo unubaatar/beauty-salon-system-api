@@ -2,8 +2,8 @@ const ServiceCategory = require("../models/serviceCategory");
 
 exports.create = async(req , res , next) => {
     try {
-        const { title , description } = req.body;
-        if(!title) {
+        const { title , description , image } = req.body;
+        if(!title || !image) {
             return res.status(404).json({ message: "Insert all fields" });
         }
         const newCategory = new ServiceCategory(req.body);
