@@ -20,10 +20,10 @@ const serviceVariant = new Schema(
         type: Number,
         required: true
     },
-    image: {
-        type: String,
-        required: true
-    },
+    // image: {
+    //     type: String,
+    //     required: true
+    // },
     duration: {
         type: Number,
         required: true

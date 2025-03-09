@@ -4,7 +4,7 @@ const Service = require("../models/service");
 exports.create = async (req, res, next) => {
   try {
     const { service, title, body, price, image, duration } = req.body;
-    if (!service || !title || !body || !price || !image || !duration) {
+    if (!service || !title || !body || !price || !duration) {
       return res.status(400).json({ message: "Insert all fields" });
     }
     const foundService = await Service.findById(service);

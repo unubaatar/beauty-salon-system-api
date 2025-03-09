@@ -56,6 +56,7 @@ exports.list = async(req , res , next) => {
             // .skip((page - 1 ) * per_page)
             // .limit(per_page)
             .populate("workers category")
+            .sort({ createdAt: -1 });
         return res.status(200).json({ count: count , rows: services });
     } catch(err) {
         console.log(err);
@@ -68,6 +69,7 @@ exports.all = async(req , res , next) => {
         const count = await Service.countDocuments({});
         const services = await Service.find({})
         .populate("workers category")
+        .sort({ createdAt: -1 });
     return res.status(200).json({ count: count , rows: services });
     } catch(err) {
         console.log(err);
