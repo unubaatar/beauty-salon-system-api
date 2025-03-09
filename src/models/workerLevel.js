@@ -10,6 +10,9 @@ const workerLevelSchema = new Schema(
     image: {
         type: String,
     },
+    description: {
+      type: String,
+    },
     isActive: {
         type: Boolean,
         default: true

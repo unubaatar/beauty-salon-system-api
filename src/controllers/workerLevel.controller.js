@@ -4,7 +4,7 @@ exports.create = async(req , res , next) => {
     try {
         const { level , image } = req.body;
         if(!level) {
-            return res.staus(404).json({ message: "Алдаа заалаа"  });
+            return res.status(404).json({ message: "Алдаа заалаа"  });
         }
         const newWorkerLevel = new WorkerLevel(req.body);
         await newWorkerLevel.save();
