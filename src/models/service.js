@@ -27,7 +27,7 @@ const serviceSchema = new Schema(
     },
     duration: {
       type: Number,
-      required: true
+      required: true,
     },
     workers: [
       {
@@ -37,14 +37,30 @@ const serviceSchema = new Schema(
     ],
     category: {
       type: Schema.Types.ObjectId,
-      ref: "ServiceCategory"
+      ref: "ServiceCategory",
     },
     variants: [
       {
         type: Schema.Types.ObjectId,
-        ref: "ServiceVariant"
-      }
-    ]
+        ref: "ServiceVariant",
+      },
+    ],
+    hasAdditionalPrice: {
+      type: Boolean,
+      default: false
+    },
+    additionalPrices: [
+      {
+        workerLevel: {
+          type: Schema.Types.ObjectId,
+          ref: "WorkerLevel",
+        },
+        additionalPrice: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

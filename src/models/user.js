@@ -48,6 +48,7 @@ const userSchema = new Schema(
     },
     level: {
       type: Schema.Types.ObjectId,
+      ref: "WorkerLevel"
     }
   },
   {

@@ -33,7 +33,10 @@ exports.update = async(req , res , next) => {
 exports.getById = async(req , res , next) => {
     try {
         const { _id } = req.body;
-        const service = await Service.findById(_id).populate("variants workers");
+        const service = await Service.findById(_id).populate("variants workers").populate({
+            path: "additionalPrices",
+            populate: "workerLevel"
+        });
         if(!service) {
             return res.status(404).json({ message: "Service not found" });
         }
