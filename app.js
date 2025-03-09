@@ -25,6 +25,7 @@ const scheduleRoutes = require("./src/routes/schedule.route");
 const timeReserveRoutes = require("./src/routes/timeReserve.route");
 const serviceCategoryRoutes = require("./src/routes/serviceCategory.route");
 const serviceVariantRoutes = require("./src/routes/serviceVariant.route");
+const workerLevelRoutes = require("./src/routes/workerLevel.route");
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/customers" , customerRoutes);
@@ -34,6 +35,7 @@ app.use("/api/v1/timeRequests" , timeRequestRoutes);
 app.use("/api/v1/timeReserves" , timeReserveRoutes);
 app.use("/api/v1/serviceCategories" , serviceCategoryRoutes);
 app.use("/api/v1/serviceVariants" , serviceVariantRoutes);
+app.use("/api/v1/workerLevels" , workerLevelRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);

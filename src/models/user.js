@@ -46,6 +46,9 @@ const userSchema = new Schema(
     //   enum: roles,
       default: "worker",
     },
+    level: {
+      type: Schema.Types.ObjectId,
+    }
   },
   {
     timestamps: true,
