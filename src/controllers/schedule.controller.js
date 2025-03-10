@@ -145,7 +145,7 @@ exports.getByDate = async (req, res, next) => {
           populate: [
             {
               path: "services",
-              select: "title price",
+              populate: "variant service",
             },
             {
               path: "customer",

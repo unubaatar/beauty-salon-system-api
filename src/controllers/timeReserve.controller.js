@@ -2,29 +2,32 @@ const TimeReserve = require("../models/timeReserve");
 const TimeRequest = require("../models/timeRequest");
 const Schedule = require("../models/schedule");
 const Service = require("../models/service");
+const ServiceVariant = require("../models/serviceVariant");
 const POSSIBLE_TIMES = require("../constants/possibleTimes");
 
 exports.create = async(req , res , next) => {
     try {
         const { customer , services , schedule ,  startTime } = req.body;
 
+        console.log(services);
+
         if(!customer || !services || !schedule || !startTime) {
             return res.status(404).json({ message: "Insert all fields" })
         };
-
-        const query = {
-            _id: { $in: services }
-        };
-        const foundServices = await Service.find(query);
         
         let totalDuration = 0;
-        foundServices.map((service) => {
-            totalDuration += service.duration;
-        });
-
         let totalAmount = 0;
-        foundServices.map((service) => {
-            totalAmount += service.price
+
+        await services.map(async (service) => {
+            const foundService = await Service.findById(service.service);
+            if(service.variant) {
+                const foundVariant = await ServiceVariant.findById(service.variant);
+                totalDuration += foundVariant.duration;
+                totalAmount += foundVariant.price;
+            } else {
+                totalDuration += foundService.duration;
+                totalAmount += foundService.price;
+            }
         });
 
         const foundSchedule = await Schedule.findById(schedule).populate("timeRequests");
