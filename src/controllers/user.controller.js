@@ -45,7 +45,9 @@ exports.login = async (req, res, next) => {
       return res.status(400).json({ message: "Password not match" });
     }
 
-    return res.status(200).json({ user: foundUser }); 
+    const token = foundUser.getJsonWebToken();
+
+    return res.status(200).json({ user: foundUser , token}); 
   } catch (err) {
     next(err);
   }

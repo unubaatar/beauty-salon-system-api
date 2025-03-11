@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const defaultImage = "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
+const defaultImage =
+  "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
 
 const userSchema = new Schema(
   {
@@ -18,12 +19,12 @@ const userSchema = new Schema(
     phone: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     isActive: {
       type: Boolean,
@@ -31,7 +32,7 @@ const userSchema = new Schema(
     },
     isApproved: {
       type: Boolean,
-      default: false
+      default: false,
     },
     password: {
       type: String,
@@ -39,17 +40,17 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String,
-      default: defaultImage
+      default: defaultImage,
     },
     role: {
       type: String,
-    //   enum: roles,
+      //   enum: roles,
       default: "worker",
     },
     level: {
       type: Schema.Types.ObjectId,
-      ref: "WorkerLevel"
-    }
+      ref: "WorkerLevel",
+    },
   },
   {
     timestamps: true,
@@ -68,9 +69,16 @@ userSchema.pre("save", async function (next) {
   }
 });
 
+userSchema.methods.getJsonWebToken = function () {
+  const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRESIN,
+  });
+  return token;
+};
+
 userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-const User = mongoose.model("User" , userSchema);
+const User = mongoose.model("User", userSchema);
 module.exports = User;
