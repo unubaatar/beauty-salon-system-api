@@ -22,6 +22,10 @@ const timeReserveSchema = new Schema(
           type: Schema.Types.ObjectId,
           ref: "ServiceVariant",
         },
+        price: {
+          type: Number,
+          required: true
+        }
       },
     ],
     schedule: {
@@ -63,6 +67,17 @@ const timeReserveSchema = new Schema(
       enum: timeReservePaymentStates,
       default: "pending",
     },
+    additionalPrices: [
+      {
+        service: {
+          type: Schema.Types.ObjectId,
+          ref: "Service",
+        },
+        price: {
+          type: Number,
+        } 
+      }
+    ]
   },
   {
     timestamps: true,

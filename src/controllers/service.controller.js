@@ -58,7 +58,7 @@ exports.list = async(req , res , next) => {
         const services = await Service.find(query)
             // .skip((page - 1 ) * per_page)
             // .limit(per_page)
-            .populate("workers category")
+            .populate("workers category variants")
             .sort({ createdAt: -1 });
         return res.status(200).json({ count: count , rows: services });
     } catch(err) {

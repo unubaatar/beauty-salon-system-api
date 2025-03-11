@@ -5,5 +5,6 @@ const workerLevelControllers = require("../controllers/workerLevel.controller");
 router.post("/create" , workerLevelControllers.create);
 router.post("/update" , workerLevelControllers.update);
 router.post("/all" , workerLevelControllers.all);
+router.post("/getAdditionalFee" , workerLevelControllers.getAdditionalFee);
 
 module.exports = router;
