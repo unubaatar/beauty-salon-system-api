@@ -16,17 +16,20 @@ exports.create = async (req, res, next) => {
     let totalDuration = 0;
     let totalAmount = 0;
 
-    await services.map(async (service) => {
-      const foundService = await Service.findById(service.service);
-      if (service.variant) {
-        const foundVariant = await ServiceVariant.findById(service.variant);
-        totalDuration += foundVariant.duration;
-        totalAmount += foundVariant.price;
-      } else {
-        totalDuration += foundService.duration;
-        totalAmount += foundService.price;
-      }
-    });
+    await Promise.all(
+      services.map(async (service) => {
+        const foundService = await Service.findById(service.service);
+        if (service.variant) {
+          const foundVariant = await ServiceVariant.findById(service.variant);
+          totalDuration += foundVariant.duration;
+          totalAmount += foundVariant.price;
+        } else {
+          totalDuration += foundService.duration;
+          totalAmount += foundService.price;
+        }
+      })
+    );
+
 
     additionalPrices.map((price) => {
       totalAmount += price.price;
