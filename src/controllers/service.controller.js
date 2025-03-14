@@ -90,7 +90,10 @@ exports.getWorkerByService = async (req, res, next) => {
 
     const foundServices = await Service.find({
       _id: { $in: services },
-    }).populate("workers");
+    }).populate({
+      path: 'workers',
+      populate: 'level'
+    });
 
     let allWorkers = [];
 

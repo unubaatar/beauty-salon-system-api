@@ -85,7 +85,7 @@ exports.list = async(req , res , next) => {
 exports.all = async(req , res , next) => {
   try {
     const count = await User.countDocuments({});
-    const users = await User.find({});
+    const users = await User.find({}).populate("level");
     return res.status(200).json({ count: count , rows: users });
   } catch(err) {
     console.log(err);

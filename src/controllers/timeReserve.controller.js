@@ -10,17 +10,13 @@ exports.create = async (req, res, next) => {
     const { customer, services, schedule, startTime, additionalPrices } =
       req.body;
 
-    console.log(req.body);
-
     if (!customer || !services || !schedule || !startTime) {
       return res.status(404).json({ message: "Insert all fields" });
     }
 
     let totalDuration = 0;
     let totalAmount = 0;
-
-    console.log(services);
-
+    
     await Promise.all(
       services.map(async (service) => {
         const foundService = await Service.findById(service.service);
@@ -52,7 +48,6 @@ exports.create = async (req, res, next) => {
       return res.status(404).json({ message: "Duration is too high" });
     }
 
-    console.log(startSection, endSection);
 
     for (let i = startSection; i < endSection; i++) {
       if (foundSchedule.timeRequests[i].hasReserved) {
