@@ -16,7 +16,7 @@ exports.create = async (req, res, next) => {
 
     let totalDuration = 0;
     let totalAmount = 0;
-    
+
     await Promise.all(
       services.map(async (service) => {
         const foundService = await Service.findById(service.service);
@@ -48,7 +48,6 @@ exports.create = async (req, res, next) => {
       return res.status(404).json({ message: "Duration is too high" });
     }
 
-
     for (let i = startSection; i < endSection; i++) {
       if (foundSchedule.timeRequests[i].hasReserved) {
         return res.status(404).json({ message: "Already registered" });
@@ -69,6 +68,14 @@ exports.create = async (req, res, next) => {
       `${foundSchedule.dateTitle}T${POSSIBLE_TIMES[endSection]}`
     );
 
+    const year = startDate.getFullYear() % 100;
+    const month = String(startDate.getMonth() + 1).padStart(2, "0");
+    const day = String(startDate.getDate()).padStart(2, "0");
+    const hours = String(startDate.getHours()).padStart(2, "0");
+    const minutes = String(startDate.getMinutes()).padStart(2, "0");
+
+    const timeReserveNumber = `TS${year}${month}${day}${hours}${minutes}`;
+
     const params = {
       customer: customer,
       services: services,
@@ -80,6 +87,7 @@ exports.create = async (req, res, next) => {
       totalAmount: totalAmount,
       dateTitle: foundSchedule.dateTitle,
       additionalPrices: additionalPrices,
+      timeReserveNumber: timeReserveNumber,
     };
 
     const newTimeReserve = new TimeReserve(params);
@@ -88,6 +96,88 @@ exports.create = async (req, res, next) => {
     foundSchedule.timeReserves.push(newTimeReserve);
     await foundSchedule.save();
     return res.status(200).json(newTimeReserve);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+exports.getById = async (req, res, next) => {
+  try {
+    const { _id, ...body } = req.body;
+
+    const foundTimeReserve = await TimeReserve.findById(_id)
+      .populate([
+        {
+          path: "services",
+          populate: {
+            path: "service",
+            populate: {
+              path: "variants category",
+            },
+          },
+        },
+        {
+          path: "services",
+          populate: {
+            path: "variant duration",
+            // select: "title"
+          },
+        },
+      ])
+      .populate({
+        path: "additionalPrices.service",
+        select: "title",
+      })
+      .populate({
+        path: "customer",
+        select: "firstName lastName phone email",
+      })
+    if (!foundTimeReserve) {
+      return res.status(404).json({ message: "Not found" });
+    }
+    return res.status(200).json(foundTimeReserve);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+exports.getByCustomer = async (req, res, next) => {
+  try {
+    const { customerId } = req.body;
+    const foundTimeReserves = await TimeReserve.find({ customer: customerId })
+      .populate({
+        path: "customer",
+        select: "firstName lastName phone email",
+      })
+      .populate([
+        {
+          path: "services",
+          populate: {
+            path: "service",
+            populate: {
+              path: "variants category",
+            },
+          },
+        },
+        {
+          path: "services",
+          populate: {
+            path: "variant duration",
+            // select: "title"
+          },
+        },
+      ]);
+    const foundTimeReservesCount = await TimeReserve.countDocuments({
+      customer: customerId,
+    });
+    if (!foundTimeReserves) {
+      return res.status(400).json({ message: "Not found" });
+    }
+    return res
+      .status(200)
+      .json({ count: foundTimeReservesCount, rows: foundTimeReserves });
   } catch (err) {
     console.log(err);
     next(err);

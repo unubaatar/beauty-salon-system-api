@@ -67,6 +67,10 @@ const timeReserveSchema = new Schema(
       enum: timeReservePaymentStates,
       default: "pending",
     },
+    timeReserveNumber: {
+      type: String,
+      required: true
+    },
     additionalPrices: [
       {
         service: {
