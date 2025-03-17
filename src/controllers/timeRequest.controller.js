@@ -18,17 +18,28 @@ exports.getPossibleTimes = async(req , res , next) => {
         if(!schedule) {
             return res.status(400).json({ message: "Цаг олдсонгүй" });
         }
-        const bookingTimes = await TimeRequest.find({ schedule: schedule , hasReserved: false });
+        const bookingTimes = await TimeRequest.find({ schedule: schedule , hasReserved: false }).populate({
+            path: "schedule",
+            select: "dateTitle"
+        });
         const count = await TimeRequest.countDocuments({ schedule: schedule , hasReserved: false});
 
         const totalBookingTimes = await TimeRequest.find({ schedule: schedule });
 
 
+        const now = new Date();
 
         let totalPossibleTimes = [];
 
         const durationSize = Math.ceil(duration / 30);
         for(let time of bookingTimes) {
+
+            const dateStr = time.schedule.dateTitle; 
+            const timeStr =  time.time;
+            const date = `${dateStr}T${timeStr}:00`; 
+
+            const inputDate = new Date(date);
+
             const index = totalBookingTimes.findIndex(timeToFind => timeToFind.time === time.time);
             let count = 0;
             for(let i = index ; i < index + durationSize ; i++) {
@@ -36,7 +47,7 @@ exports.getPossibleTimes = async(req , res , next) => {
                     count++;
                 }
             };
-            if(count == durationSize) {
+            if(count == durationSize &&  inputDate > now) {
                 totalPossibleTimes.push(time);
             };
         };
