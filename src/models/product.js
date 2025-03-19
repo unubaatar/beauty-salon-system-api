@@ -31,6 +31,11 @@ const productSchema = new Schema({
     sellPrice: {
         type: Number,
     },
+    category: {
+        type: Schema.Types.ObjectId,
+        ref: "ProductCategory",
+        required: true
+    },
     isActive: {
         type: Boolean,
         default: true

@@ -46,7 +46,12 @@ exports.update = async(req , res , next ) => {
 
 exports.getById = async(req , res , next ) => {
     try {
-        console.log("getById");
+        const { _id } = req.body;
+        const foundProduct = await Product.findById(_id).populate("category");
+        if(!foundProduct) {
+            return res.status(400).json({ message: "Product not found" });
+        };
+        return res.status(200).json(foundProduct);
     } catch(err) {
         console.log(err);
     }
