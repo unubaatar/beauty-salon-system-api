@@ -36,6 +36,12 @@ const productSchema = new Schema({
         ref: "ProductCategory",
         required: true
     },
+    variants: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "ProductVariant",
+        }
+    ],
     isActive: {
         type: Boolean,
         default: true
