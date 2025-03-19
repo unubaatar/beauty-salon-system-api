@@ -61,3 +61,14 @@ exports.getById = async (req, res, next) => {
     console.log(err);
   }
 };
+
+exports.getByCategory = async ( req , res , next) => {
+  try {
+    const { category } = req.body;
+    const products = await Product.find({ category: category });
+    const count = await Product.countDocuments({category: category })
+    return res.status(200).json({ count: count , rows: products });
+  } catch(err) {
+    console.log(err);
+  }
+}
