@@ -14,6 +14,18 @@ const productVariantSchema = new Schema(
       type: Number,
       required: true,
     },
+    options: [
+      {
+        optionType: {
+          type: Schema.Types.ObjectId,
+          ref: "ProductOption"
+        },
+        name: {
+          type: String,
+          required: true
+        }
+      }
+    ],
     isActive: {
       type: Boolean,
       default: true,
