@@ -3,6 +3,9 @@ const Product = require("../models/product");
 exports.create = async(req , res , next ) => {
     try {
         const { name , description , images , price , stock  } = req.body;
+        if(images.length === 0) {
+            return res.status(400).json({ message: "Insert all fields" });
+        }
         if(!name || !description || !images || !price || !stock) {
             return res.status(400).json({ message: "Insert all fields" });
         };

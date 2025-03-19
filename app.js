@@ -41,6 +41,15 @@ app.use("/api/v1/workerLevels" , workerLevelRoutes);
 app.use("/api/v1/products" , productRoutes);
 app.use("/api/v1/productCategories" , productCategoryRoutes);
 
+
+app.use('/' , async(req , res) => {
+  try {
+      return res.send("<h1>Beauty salon api</h1>");
+  } catch(err) {
+    console.log(err);
+  }
+})
+
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
