@@ -21,6 +21,11 @@ exports.list = async (req, res, next) => {
   try {
     const { filter, page = 1, per_page = 10 } = req.body;
     const products = await Product.find({})
+      .populate("category optionTypes variants")
+      .populate({
+        path: "variants",
+        populate: "options.optionType",
+      })
       .skip((page - 1) * per_page)
       .limit(per_page)
       .sort({ createdAt: -1 });
@@ -52,7 +57,7 @@ exports.getById = async (req, res, next) => {
       .populate({
         path: "variants",
         populate: "options.optionType",
-      })
+      });
     if (!foundProduct) {
       return res.status(400).json({ message: "Product not found" });
     }
@@ -62,13 +67,18 @@ exports.getById = async (req, res, next) => {
   }
 };
 
-exports.getByCategory = async ( req , res , next) => {
+exports.getByCategory = async (req, res, next) => {
   try {
     const { category } = req.body;
-    const products = await Product.find({ category: category });
-    const count = await Product.countDocuments({category: category })
-    return res.status(200).json({ count: count , rows: products });
-  } catch(err) {
+    const products = await Product.find({ category: category })
+      .populate("category optionTypes variants")
+      .populate({
+        path: "variants",
+        populate: "options.optionType",
+      });
+    const count = await Product.countDocuments({ category: category });
+    return res.status(200).json({ count: count, rows: products });
+  } catch (err) {
     console.log(err);
   }
-}
+};
