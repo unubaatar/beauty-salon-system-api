@@ -1,10 +1,11 @@
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 exports.create = async (req, res, next) => {
   try {
     const { firstName, lastName, phone, email, password } = req.body;
 
-    if (!firstName || !lastName || !phone || !email  || !password) {
+    if (!firstName || !lastName || !phone || !email || !password) {
       return res.status(400).json({ message: "Insert all fields" });
     }
 
@@ -35,7 +36,7 @@ exports.login = async (req, res, next) => {
       return res.status(400).json({ message: "Insert all fields" });
     }
 
-    const foundUser = await User.findOne({ phone: phone })
+    const foundUser = await User.findOne({ phone: phone });
     if (!foundUser) {
       return res.status(400).json({ message: "User not found" });
     }
@@ -47,58 +48,83 @@ exports.login = async (req, res, next) => {
 
     const token = foundUser.getJsonWebToken();
 
-    return res.status(200).json({ user: foundUser , token}); 
+    return res.status(200).json({ user: foundUser, token });
   } catch (err) {
     next(err);
   }
 };
 
-exports.update = async(req , res , next) => {
+exports.update = async (req, res, next) => {
   try {
-    const { _id , ...body } = req.body;
-    const user = await User.findByIdAndUpdate(_id , body);
-    if(!user) {
-      return res.status(404).json({message: "User not found"});
+    const { _id, ...body } = req.body;
+    const user = await User.findByIdAndUpdate(_id, body);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
     return res.status(200).json(user);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     next(err);
   }
-}
+};
 
-exports.list = async(req , res , next) => {
+exports.list = async (req, res, next) => {
   try {
-    const { per_page = 10 , page = 1 , filter } = req.body;
+    const { per_page = 10, page = 1, filter } = req.body;
     const query = {};
     const count = await User.countDocuments({});
     const users = await User.find(query)
       .skip((page - 1) * per_page)
-      .limit(per_page)
-    return res.status(200).json({ count: count , rows: users });
-  } catch(err) {
+      .limit(per_page);
+    return res.status(200).json({ count: count, rows: users });
+  } catch (err) {
     console.log(err);
     next(err);
   }
-}
+};
 
-exports.all = async(req , res , next) => {
+exports.all = async (req, res, next) => {
   try {
     const count = await User.countDocuments({});
     const users = await User.find({}).populate("level");
-    return res.status(200).json({ count: count , rows: users });
-  } catch(err) {
+    return res.status(200).json({ count: count, rows: users });
+  } catch (err) {
     console.log(err);
     next(err);
   }
-}
+};
 
-exports.getWorkers = async(req , res , next) => {
+exports.getWorkers = async (req, res, next) => {
   try {
     const users = await User.find({ role: "worker" });
     return res.status(200).json(users);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     next(err);
   }
-}
+};
+
+exports.checkToken = async (req, res, next) => {
+  try {
+    const { token } = req.body; 
+    if (!token) {
+      return res.status(403).send("Token is missing");
+    }
+    const decoded = jwt.verify(token, process.env.SECRET_KEY); 
+    if (!decoded) {
+      return res.status(401).send("Invalid token");
+    }
+    const expirationTime = decoded.exp;
+    if (!expirationTime) {
+      return res.status(401).send("Token does not have an expiration time");
+    }
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (expirationTime < currentTime) {
+      return res.status(401).json({ message: "Expired" });
+    };
+    return res.status(200).json({ message: "Ok" })
+  } catch (err) {
+    console.log(err);  
+    next(err);
+  }
+};

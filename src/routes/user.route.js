@@ -8,5 +8,6 @@ router.post('/list' , userController.list);
 router.post('/update' , userController.update);
 router.post('/all' , userController.all);
 router.post('/getWorkers' , userController.getWorkers);
+router.post('/checkToken' , userController.checkToken);
 
 module.exports = router;

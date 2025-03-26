@@ -70,8 +70,8 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.getJsonWebToken = function () {
-  const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRESIN,
+  const token = jwt.sign({ id: this._id }, process.env.SECRET_KEY, {
+    expiresIn: '5m',
   });
   return token;
 };

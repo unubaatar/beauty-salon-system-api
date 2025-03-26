@@ -47,7 +47,7 @@
   });
 
   customerSchema.methods.getJsonWebToken = function() {
-    const token = jwt.sign({ id: this._id } , process.env.JWT_SECRET ,  { expiresIn: '30s' });
+    const token = jwt.sign({ id: this._id } , process.env.SECRET_KEY ,  { expiresIn: '1h' });
     return token;
   };
 
