@@ -7,7 +7,7 @@ exports.create = async(req , res , next) => {
         if(!productId || !variant ) {
             return res.status(400).json({ message: "Insert all fields" });
         }
-        if(!variant.price || !variant.title || !variant.options) {
+        if(!variant.price || !variant.title ) {
             return res.status(400).json({ message: "Insert all fields" });
         }
         const foundProduct = await Product.findById(productId);
@@ -15,9 +15,6 @@ exports.create = async(req , res , next) => {
         if(!foundProduct) {
             return res.status(400).json({ message: "Not found" });
         }
-        if(variant.options.length != foundProduct.optionTypes.length) {
-            return res.status(400).json({ message: "Not found" });
-        };   
         const newVariant = new ProductVariant(variant);
         await newVariant.save();
         foundProduct.variants.push(newVariant);
@@ -31,7 +28,6 @@ exports.create = async(req , res , next) => {
 exports.update = async(req , res , next) => {
     try {
         const { _id, ...body } = req.body;
-
         const foundVariant = await ProductVariant.findByIdAndUpdate(_id , body);
         if(!foundVariant) {
             return res.status(404).json({ message: "Not found" });

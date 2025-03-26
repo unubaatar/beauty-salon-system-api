@@ -108,23 +108,20 @@ exports.checkToken = async (req, res, next) => {
   try {
     const { token } = req.body; 
     if (!token) {
-      return res.status(403).send("Token is missing");
+      return res.status(302).send("Token is missing"); 
     }
-    const decoded = jwt.verify(token, process.env.SECRET_KEY); 
+    const decoded = jwt.decode(token);
     if (!decoded) {
-      return res.status(401).send("Invalid token");
+      return res.status(401).send("Invalid token"); 
     }
     const expirationTime = decoded.exp;
-    if (!expirationTime) {
-      return res.status(401).send("Token does not have an expiration time");
-    }
-    const currentTime = Math.floor(Date.now() / 1000);
+    const currentTime = Math.floor(Date.now() / 1000); 
     if (expirationTime < currentTime) {
-      return res.status(401).json({ message: "Expired" });
-    };
-    return res.status(200).json({ message: "Ok" })
+      return res.status(200).json({ valid: false }); 
+    }
+    return res.status(200).json({ valid: true });
   } catch (err) {
-    console.log(err);  
-    next(err);
+    console.error(err);
+    return next(err); 
   }
 };

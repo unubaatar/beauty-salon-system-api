@@ -29,7 +29,6 @@ const workerLevelRoutes = require("./src/routes/workerLevel.route");
 const productRoutes = require("./src/routes/product.route");
 const productCategoryRoutes = require("./src/routes/productCategory.route");
 const productVariantRoutes = require("./src/routes/productVariant.route");
-const productOptionsRoutes = require("./src/routes/productOption.route");
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/customers" , customerRoutes);
@@ -43,7 +42,6 @@ app.use("/api/v1/workerLevels" , workerLevelRoutes);
 app.use("/api/v1/products" , productRoutes);
 app.use("/api/v1/productCategories" , productCategoryRoutes);
 app.use("/api/v1/productVariants" , productVariantRoutes);
-app.use("/api/v1/productOptions" , productOptionsRoutes );
 
 
 app.use('/' , async(req , res) => {

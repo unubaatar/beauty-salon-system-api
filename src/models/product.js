@@ -42,12 +42,6 @@ const productSchema = new Schema({
             ref: "ProductVariant",
         }
     ],
-    optionTypes: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "ProductOption"
-        }
-    ],
     isActive: {
         type: Boolean,
         default: true
