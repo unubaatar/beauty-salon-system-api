@@ -4,6 +4,8 @@
   const bcrypt = require("bcrypt");
   const jwt = require("jsonwebtoken");
 
+  const defaultAvatar = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDXHyqEEcIEQzggUF5RIBe8g37M9n1guqKhg&s";
+
   const customerSchema = new Schema(
     {
       firstName: {
@@ -28,6 +30,10 @@
         type: String,
         required: true,
       },
+      avatar: {
+        type: String,
+        default: defaultAvatar
+      }
     },
     {
       timestamps: true,

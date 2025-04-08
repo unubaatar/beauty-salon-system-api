@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 exports.create = async (req, res, next) => {
   try {
-    const { firstName, lastName, phone, email, password } = req.body;
+    const { firstName, lastName, phone, email, password  , avatar } = req.body;
 
     if (!firstName || !lastName || !phone || !email || !password) {
       return res.status(400).json({ message: "Insert all fields" });
@@ -48,8 +48,27 @@ exports.login = async (req, res, next) => {
     const token = foundCustomer.getJsonWebToken();
     return res
       .status(200)
-      .json({ customer: foundCustomer._id.toString(), token });
+      .json({
+        customer: foundCustomer._id.toString(),
+        token,
+        name: foundCustomer.firstName,
+        avatar: foundCustomer.avatar,
+      });
   } catch (err) {
     next(err);
   }
 };
+
+
+exports.getById = async(req  , res , next) => {
+  try {
+    const { _id } = req.body;
+    const customer = await Customer.findById(_id).select("-password");
+    if(!customer) {
+      return res.status(400).json({ message: "User not found" });
+    }  
+    return res.status(200).json(customer);
+  } catch(err) {
+    next(err);
+  }
+}

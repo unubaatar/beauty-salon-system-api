@@ -152,7 +152,7 @@ exports.getByCustomer = async (req, res, next) => {
     const foundTimeReserves = await TimeReserve.find({ customer: customerId })
       .populate({
         path: "customer",
-        select: "firstName lastName phone email",
+        select: "firstName lastName phone email avatar",
       })
       .populate([
         {
