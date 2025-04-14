@@ -134,7 +134,7 @@ exports.getById = async (req, res, next) => {
       })
       .populate({
         path: "customer",
-        select: "firstName lastName phone email",
+        select: "firstName lastName phone email avatar",
       })
     if (!foundTimeReserve) {
       return res.status(404).json({ message: "Not found" });

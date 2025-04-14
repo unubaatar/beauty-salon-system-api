@@ -33,6 +33,10 @@
       avatar: {
         type: String,
         default: defaultAvatar
+      },
+      bonusPoint: {
+        type: Number,
+        default: 0
       }
     },
     {
