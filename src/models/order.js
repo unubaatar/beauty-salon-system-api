@@ -15,8 +15,8 @@ const orderSchema = new Schema(
     items: [
       {
         type: Schema.Types.ObjectId,
-        ref: "CartItem",
-      },
+        ref: "OrderItem",
+      }
     ],
     orderNumber: {
       type: String,
