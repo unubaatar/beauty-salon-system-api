@@ -6,7 +6,7 @@ exports.create = async (req, res, next) => {
     if (images.length === 0) {
       return res.status(400).json({ message: "Insert all fields" });
     }
-    if (!name || !description || !images || !price || !stock ) {
+    if (!name || !description || !images || !price || !stock) {
       return res.status(400).json({ message: "Insert all fields" });
     }
     const product = new Product(req.body);
@@ -77,5 +77,21 @@ exports.getByCategory = async (req, res, next) => {
     return res.status(200).json({ count: count, rows: products });
   } catch (err) {
     console.log(err);
+  }
+};
+
+exports.getLatest = async (req, res, next) => {
+  try {
+    const services = await Product.find({})
+      .populate("category variants")
+      .populate({
+        path: "variants",
+      })
+      .sort({ createdAt: -1 })
+      .limit(4);
+    return res.status(200).json(services);
+  } catch (err) {
+    console.log(err);
+    next(err);
   }
 };

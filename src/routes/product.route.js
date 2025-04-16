@@ -7,5 +7,6 @@ router.post("/list" ,  productController.list);
 router.post("/update" ,  productController.update);
 router.post("/getById" ,  productController.getById);
 router.post("/getByCategory" ,  productController.getByCategory);
+router.post("/getLatest" ,  productController.getLatest);
 
 module.exports = router;

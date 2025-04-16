@@ -91,8 +91,8 @@ exports.getWorkerByService = async (req, res, next) => {
     const foundServices = await Service.find({
       _id: { $in: services },
     }).populate({
-      path: 'workers',
-      populate: 'level'
+      path: "workers",
+      populate: "level",
     });
 
     let allWorkers = [];
@@ -126,6 +126,24 @@ exports.getWorkerByService = async (req, res, next) => {
     }
 
     return res.status(200).json(uniqueWorkers);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+exports.getLatest = async (req, res, next) => {
+  try {
+    const services = await Service.find({})
+      .populate("variants workers")
+      .populate({
+        path: "additionalPrices",
+        populate: "workerLevel",
+      })
+      .populate("category variants")
+      .sort({ createdAt: -1 })
+      .limit(4);
+    return res.status(200).json(services);
   } catch (err) {
     console.log(err);
     next(err);
