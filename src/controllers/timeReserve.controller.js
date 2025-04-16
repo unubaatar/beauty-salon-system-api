@@ -31,6 +31,13 @@ exports.create = async (req, res, next) => {
       })
     );
 
+    services.forEach(service => {
+      const matchingFee = additionalPrices.find(fee => fee.service === service.service);
+      if (matchingFee) {
+        service.price += matchingFee.price;
+      }
+    });
+
     if (additionalPrices) {
       additionalPrices.map((price) => {
         totalAmount += price.price;
@@ -99,6 +106,7 @@ exports.create = async (req, res, next) => {
     foundSchedule.timeReserves.push(newTimeReserve);
     await foundSchedule.save();
     return res.status(200).json(newTimeReserve);
+    return res.status(200).send('ok');
   } catch (err) {
     console.log(err);
     next(err);
@@ -111,6 +119,16 @@ exports.getById = async (req, res, next) => {
 
     const foundTimeReserve = await TimeReserve.findById(_id)
       .populate([
+        {
+          path: "schedule",
+          select: "worker",
+          populate: {
+            path: "worker",
+            populate: {
+              path: "level"
+            }
+          }
+        },
         {
           path: "services",
           populate: {
@@ -186,3 +204,17 @@ exports.getByCustomer = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.update = async(req , res , next) => {
+  try {
+    const { _id } = req.body;
+    const foundTimeReserve = await TimeReserve.findByIdAndUpdate(_id , req.body);
+    if(!foundTimeReserve) {
+      return res.status(400).json({ message: "Not found" });
+    }
+    return res.status(200).json({ message: "Successful" }); 
+  } catch(err) {
+    console.log(err);
+    next(err);
+  }
+}

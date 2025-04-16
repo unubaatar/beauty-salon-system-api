@@ -1,5 +1,5 @@
 timeReserveStates = [
-    "canceled",
+    "pending",
     "in process", 
     "complete"
 ]
