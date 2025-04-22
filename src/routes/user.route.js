@@ -9,5 +9,6 @@ router.post('/update' , userController.update);
 router.post('/all' , userController.all);
 router.post('/getWorkers' , userController.getWorkers);
 router.post('/checkToken' , userController.checkToken);
+router.post('/getById' , userController.getById);
 
 module.exports = router;

@@ -125,3 +125,17 @@ exports.checkToken = async (req, res, next) => {
     return next(err); 
   }
 };
+
+exports.getById = async(req , res , next) => {
+  try {
+    const { _id } = req.body;
+    const foundUser = await User.findById(_id).select("firstName lastName avatar role");
+    if(!foundUser) {
+      return res.status(404).json({ message: "Not found" });
+    }
+    return res.status(200).json(foundUser);
+  } catch(err) {
+    console.error(err);
+    return next(err); 
+  }
+}

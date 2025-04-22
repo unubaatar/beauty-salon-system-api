@@ -31,6 +31,7 @@ const productCategoryRoutes = require("./src/routes/productCategory.route");
 const productVariantRoutes = require("./src/routes/productVariant.route");
 const cartItemRoutes = require("./src/routes/cartItem.route");
 const orderRoutes = require("./src/routes/order.route");
+const reportRoutes = require("./src/routes/report.route");
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/customers" , customerRoutes);
@@ -46,6 +47,7 @@ app.use("/api/v1/productCategories" , productCategoryRoutes);
 app.use("/api/v1/productVariants" , productVariantRoutes);
 app.use("/api/v1/cartItems" , cartItemRoutes);
 app.use("/api/v1/orders" , orderRoutes);
+app.use("/api/v1/reports" , reportRoutes);
 
 
 app.use('/' , async(req , res) => {
