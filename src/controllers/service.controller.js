@@ -1,5 +1,7 @@
 const User = require("../models/user");
 const Service = require("../models/service");
+const timeReserve = require("../models/timeReserve");
+const TimeReserve = require("../models/timeReserve");
 
 exports.create = async (req, res, next) => {
   try {
@@ -144,6 +146,67 @@ exports.getLatest = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .limit(4);
     return res.status(200).json(services);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+exports.getServiceReport = async (req, res, next) => {
+  try {
+    const { dateFilter } = req.body;
+
+    const date1 = new Date(dateFilter[0]);
+    const date2 = new Date(dateFilter[1]);
+
+    const [fromDate, toDate] =
+      date1.getTime() <= date2.getTime()
+        ? [dateFilter[0], dateFilter[1]]
+        : [dateFilter[1], dateFilter[0]];
+
+    const timeReserves = await TimeReserve.find({
+      dateTitle: { $gte: fromDate, $lte: toDate },
+    }).populate({
+      path: "services",
+      populate: {
+        path: "service",
+        select: "title image",
+      },
+    });
+
+    let data = [];
+    timeReserves.map((timeReserve) => {
+      for (let service of timeReserve.services) {
+        const foundService = data.find((serviceItem) => {
+          return (
+            serviceItem.service._id.toString() ===
+            service.service._id.toString()
+          );
+        });
+        if (!foundService) {
+          data.push({
+            service: service.service,
+            totalAmount: service.price,
+            qty: 1,
+          });
+        } else {
+          foundService.qty++;
+          foundService.totalAmount += service.price;
+        }
+      }
+    });
+
+    let totalAmount = 0;
+    for (let item of data) {
+      totalAmount += item.totalAmount;
+    }
+
+    let totalServices = 0;
+    for (let item of data) {
+      totalServices += item.qty;
+    }
+
+    return res.status(200).json({ totalAmount, totalServices, rows: data });
   } catch (err) {
     console.log(err);
     next(err);

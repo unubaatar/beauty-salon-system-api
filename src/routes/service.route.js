@@ -9,5 +9,6 @@ router.post("/all" , serviceControllers.all);
 router.post("/getWorkerByService" , serviceControllers.getWorkerByService);
 router.post("/getById" , serviceControllers.getById);
 router.post("/getLatest" ,  serviceControllers.getLatest);
+router.post("/getServiceReport" , serviceControllers.getServiceReport)
 
 module.exports = router;

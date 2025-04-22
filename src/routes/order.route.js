@@ -7,5 +7,7 @@ router.post("/list" , orderControllers.list);
 router.post("/update" , orderControllers.update);
 router.post("/getById" , orderControllers.getById);
 router.post('/getByCustomer' , orderControllers.getByCustomer);
+router.post("/update" , orderControllers.update);
+router.post("/getProductReport" , orderControllers.getProductReport)
 
 module.exports = router;

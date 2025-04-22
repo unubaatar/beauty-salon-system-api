@@ -3,6 +3,7 @@ const TimeRequest = require("../models/timeRequest");
 const Schedule = require("../models/schedule");
 const Service = require("../models/service");
 const ServiceVariant = require("../models/serviceVariant");
+const User = require("../models/user");
 const POSSIBLE_TIMES = require("../constants/possibleTimes");
 
 exports.create = async (req, res, next) => {
@@ -31,8 +32,10 @@ exports.create = async (req, res, next) => {
       })
     );
 
-    services.forEach(service => {
-      const matchingFee = additionalPrices.find(fee => fee.service === service.service);
+    services.forEach((service) => {
+      const matchingFee = additionalPrices.find(
+        (fee) => fee.service === service.service
+      );
       if (matchingFee) {
         service.price += matchingFee.price;
       }
@@ -50,8 +53,7 @@ exports.create = async (req, res, next) => {
     const startSection = POSSIBLE_TIMES.indexOf(startTime);
     const endSection =
       POSSIBLE_TIMES.indexOf(startTime) + Math.ceil(totalDuration / 30);
-
-    if (endSection >= POSSIBLE_TIMES.length) {
+    if (endSection > POSSIBLE_TIMES.length) {
       return res.status(404).json({ message: "Duration is too high" });
     }
 
@@ -97,16 +99,12 @@ exports.create = async (req, res, next) => {
       timeReserveNumber: timeReserveNumber,
     };
 
-
-    
-
     const newTimeReserve = new TimeReserve(params);
     await newTimeReserve.save();
 
     foundSchedule.timeReserves.push(newTimeReserve);
     await foundSchedule.save();
     return res.status(200).json(newTimeReserve);
-    return res.status(200).send('ok');
   } catch (err) {
     console.log(err);
     next(err);
@@ -125,9 +123,9 @@ exports.getById = async (req, res, next) => {
           populate: {
             path: "worker",
             populate: {
-              path: "level"
-            }
-          }
+              path: "level",
+            },
+          },
         },
         {
           path: "services",
@@ -153,7 +151,7 @@ exports.getById = async (req, res, next) => {
       .populate({
         path: "customer",
         select: "firstName lastName phone email avatar",
-      })
+      });
     if (!foundTimeReserve) {
       return res.status(404).json({ message: "Not found" });
     }
@@ -205,16 +203,90 @@ exports.getByCustomer = async (req, res, next) => {
   }
 };
 
-exports.update = async(req , res , next) => {
+exports.update = async (req, res, next) => {
   try {
     const { _id } = req.body;
-    const foundTimeReserve = await TimeReserve.findByIdAndUpdate(_id , req.body);
-    if(!foundTimeReserve) {
+    const foundTimeReserve = await TimeReserve.findByIdAndUpdate(_id, req.body);
+    if (!foundTimeReserve) {
       return res.status(400).json({ message: "Not found" });
     }
-    return res.status(200).json({ message: "Successful" }); 
-  } catch(err) {
+    return res.status(200).json({ message: "Successful" });
+  } catch (err) {
     console.log(err);
     next(err);
   }
-}
+};
+
+exports.getByUserReport = async (req, res, next) => {
+  try {
+    const { dateFilter } = req.body;
+
+    const date1 = new Date(dateFilter[0]);
+    const date2 = new Date(dateFilter[1]);
+
+    const [fromDate, toDate] =
+      date1.getTime() <= date2.getTime()
+        ? [dateFilter[0], dateFilter[1]]
+        : [dateFilter[1], dateFilter[0]];
+
+    const timeReserves = await TimeReserve.find({
+      dateTitle: { $gte: fromDate, $lte: toDate },
+    }).populate("schedule");
+
+    const users = await User.find({ role: "worker" }).select(
+      "firstName lastName avatar role email phone"
+    );
+
+    let reportData = [];
+
+    for (let user of users) {
+      const userData = {
+        userId: user,
+        timeReserves: [],
+      };
+      for (let timeReserve of timeReserves) {
+        if (timeReserve.schedule.worker.toString() === user._id.toString()) {
+          userData.timeReserves.push(timeReserve);
+        }
+      }
+      reportData.push(userData);
+    }
+    let lastReportData = [];
+
+    for (let data of reportData) {
+      let totalServiceCount = 0;
+      let totalWOrkedDuration = 0;
+      let totalIncome = 0;
+      for (let timeReserve of data.timeReserves) {
+        totalServiceCount += timeReserve.services.length;
+        totalWOrkedDuration += timeReserve.totalDuration;
+        totalIncome += timeReserve.totalAmount;
+      }
+      lastReportData.push({
+        worker: data.userId,
+        totalServiceCount: totalServiceCount,
+        totalWOrkedDuration: totalWOrkedDuration,
+        totalIncome: totalIncome,
+        totalTimeReserve: data.timeReserves.length,
+      });
+    }
+
+    let totalIncome = 0;
+    let totalServiceCount = 0;
+
+    for (let item of lastReportData) {
+      totalIncome += item.totalIncome;
+    }
+
+    for (let item of lastReportData) {
+      totalServiceCount += item.totalServiceCount;
+    }
+
+    return res
+      .status(200)
+      .json({ totalIncome, totalServiceCount, rows: lastReportData });
+  } catch (err) {
+    console.error("Error fetching user report:", err);
+    next(err);
+  }
+};

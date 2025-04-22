@@ -151,3 +151,60 @@ exports.getByCustomer = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.update = async (req, res, next) => {
+  try {
+    const { _id } = req.body;
+    const foundOrder = await Order.findByIdAndUpdate(_id, req.body);
+    if (!foundOrder) {
+      return res.status(400).json({ message: "Not found" });
+    }
+    return res.status(200).json({ message: "Successful" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getProductReport = async (req, res, next) => {
+  try {
+    const { dateFilter } = req.body;
+
+    const date1 = new Date(dateFilter[0]);
+    const date2 = new Date(dateFilter[1]);
+
+    const [fromDate, toDate] =
+      date1.getTime() <= date2.getTime()
+        ? [dateFilter[0], dateFilter[1]]
+        : [dateFilter[1], dateFilter[0]];
+
+    const foundOrders = await OrderItem.find({
+      createdAt: { $gte: fromDate, $lte: toDate },
+    }).populate({
+      path: "product",
+      select: "name images",
+    });
+
+    let data = [];
+
+    foundOrders.forEach((orderItem) => {
+      const existingItem = data.find(item => 
+        item.product._id.toString() === orderItem.product._id.toString()
+      );
+      if (!existingItem) {
+        data.push({
+          product: orderItem.product,
+          qty: orderItem.qty,
+          totalPrice: orderItem.totalPrice,
+        });
+      } else {
+        existingItem.qty += orderItem.qty;
+        existingItem.totalPrice += orderItem.totalPrice;
+      }
+    });
+    data.sort((item1, item2 ) => item2.qty - item1.qty);
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
