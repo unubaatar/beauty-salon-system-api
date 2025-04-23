@@ -6,6 +6,7 @@ router.post("/create" , timeReserveController.create);
 router.post("/getById" , timeReserveController.getById);
 router.post("/getByCustomer" , timeReserveController.getByCustomer);
 router.post("/update" , timeReserveController.update);
+router.post("/getbyWorker" , timeReserveController.getbyWorker);
 router.post("/getByUserReport" , timeReserveController.getByUserReport);
 
 module.exports = router;

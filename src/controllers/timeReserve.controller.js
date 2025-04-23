@@ -5,6 +5,7 @@ const Service = require("../models/service");
 const ServiceVariant = require("../models/serviceVariant");
 const User = require("../models/user");
 const POSSIBLE_TIMES = require("../constants/possibleTimes");
+const moment = require("moment");
 
 exports.create = async (req, res, next) => {
   try {
@@ -290,3 +291,33 @@ exports.getByUserReport = async (req, res, next) => {
     next(err);
   }
 };
+
+
+exports.getbyWorker = async(req , res , next) => {
+  try {
+    const { dateTitle } = req.body;
+
+    const schedule = await Schedule.findOne({ dateTitle: dateTitle })
+    .select("timeReserves dateTitle worker day")
+    .populate({
+      path: "timeReserves",
+      populate: [
+        {
+          path: "services",
+          select: "services dateTitle startTime totalAmount totalDuration state timeReserveNumber",
+          populate: [
+            { path: "service", select: "title image duration" },
+            { path: "variant", select: "title duration" }
+          ]
+        },
+        {
+          path: "customer",
+          select: "phone lastName firstName avatar",
+        }
+      ] 
+    });
+    return res.send(schedule);
+  } catch(err) {
+    console.log(err);
+  }
+}
