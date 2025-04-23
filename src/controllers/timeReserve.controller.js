@@ -51,6 +51,11 @@ exports.create = async (req, res, next) => {
     const foundSchedule = await Schedule.findById(schedule).populate(
       "timeRequests"
     );
+
+    const workerId = foundSchedule.worker.toString();
+
+    console.log(workerId);
+
     const startSection = POSSIBLE_TIMES.indexOf(startTime);
     const endSection =
       POSSIBLE_TIMES.indexOf(startTime) + Math.ceil(totalDuration / 30);
@@ -102,6 +107,14 @@ exports.create = async (req, res, next) => {
 
     const newTimeReserve = new TimeReserve(params);
     await newTimeReserve.save();
+
+    const ioCreateTimeReserve = req.app.get("ioCreateTimeReserve");
+    
+    console.log("📤 Emitting to room:", `timeReserveCreateRoom:${workerId}`);
+    
+    ioCreateTimeReserve
+      .to(`timeReserveCreateRoom:${workerId}`)
+      .emit("timeReserveCreated", newTimeReserve);
 
     foundSchedule.timeReserves.push(newTimeReserve);
     await foundSchedule.save();
@@ -207,10 +220,26 @@ exports.getByCustomer = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     const { _id } = req.body;
-    const foundTimeReserve = await TimeReserve.findByIdAndUpdate(_id, req.body);
+
+    const foundTimeReserve = await TimeReserve.findByIdAndUpdate(
+      _id,
+      req.body,
+      { new: true }
+    ).populate({ path: "schedule" });
+
     if (!foundTimeReserve) {
       return res.status(400).json({ message: "Not found" });
     }
+
+    const workerId = foundTimeReserve.schedule.worker.toString();
+    const ioUpdateTimeReserve = req.app.get("ioUpdateTimeReserve");
+
+    console.log(`timeReserveUpdateRoom:${workerId}`)
+
+    ioUpdateTimeReserve
+      .to(`timeReserveUpdateRoom:${workerId}`)
+      .emit("timeReserveUpdated", foundTimeReserve);
+
     return res.status(200).json({ message: "Successful" });
   } catch (err) {
     console.log(err);
@@ -292,32 +321,32 @@ exports.getByUserReport = async (req, res, next) => {
   }
 };
 
-
-exports.getbyWorker = async(req , res , next) => {
+exports.getbyWorker = async (req, res, next) => {
   try {
-    const { dateTitle } = req.body;
+    const { dateTitle  , worker} = req.body;
 
-    const schedule = await Schedule.findOne({ dateTitle: dateTitle })
-    .select("timeReserves dateTitle worker day")
-    .populate({
-      path: "timeReserves",
-      populate: [
-        {
-          path: "services",
-          select: "services dateTitle startTime totalAmount totalDuration state timeReserveNumber",
-          populate: [
-            { path: "service", select: "title image duration" },
-            { path: "variant", select: "title duration" }
-          ]
-        },
-        {
-          path: "customer",
-          select: "phone lastName firstName avatar",
-        }
-      ] 
-    });
+    const schedule = await Schedule.findOne({ dateTitle: dateTitle , worker: worker })
+      .select("timeReserves dateTitle worker day")
+      .populate({
+        path: "timeReserves",
+        populate: [
+          {
+            path: "services",
+            select:
+              "services dateTitle startTime totalAmount totalDuration state timeReserveNumber",
+            populate: [ 
+              { path: "service", select: "title image duration" },
+              { path: "variant", select: "title duration" },
+            ],
+          },
+          {
+            path: "customer",
+            select: "phone lastName firstName avatar",
+          },
+        ],
+      });
     return res.send(schedule);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
-}
+};

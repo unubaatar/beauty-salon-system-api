@@ -108,7 +108,7 @@ exports.checkToken = async (req, res, next) => {
   try {
     const { token } = req.body; 
     if (!token) {
-      return res.status(302).send("Token is missing"); 
+      return res.status(202).send("Token is missing"); 
     }
     const decoded = jwt.decode(token);
     if (!decoded) {

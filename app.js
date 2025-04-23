@@ -1,9 +1,43 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+
 require("dotenv").config();
 
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+app.set("io", io);
+
+const ioCreateTimeReserve = io.of("/websocket/timeReserveCreate");
+ioCreateTimeReserve.on("connection" , (socket) => {
+  console.log("[Create] Socket connected:", socket.id);
+
+  socket.on("join" , (userId) => {
+    socket.join(`timeReserveCreateRoom:${userId}`);
+    console.log(`User ${userId} joined create room`);
+  })
+})
+app.set("ioCreateTimeReserve", ioCreateTimeReserve);
+
+const ioUpdateTimeReserve  = io.of("/websocket/timeReserveUpdate");
+ioUpdateTimeReserve.on("connection", (socket) => {
+  console.log("[Update] Socket connected:", socket.id);
+
+  socket.on("join", (userId) => {
+    socket.join(`timeReserveUpdateRoom:${userId}`);
+    console.log(`User ${userId} joined update room`);
+  });
+});
+app.set("ioUpdateTimeReserve", ioUpdateTimeReserve);
 
 app.use(express.json());
 app.use(cors());
@@ -58,6 +92,6 @@ app.use('/' , async(req , res) => {
   }
 })
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
