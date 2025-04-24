@@ -71,9 +71,12 @@ exports.update = async (req, res, next) => {
 exports.list = async (req, res, next) => {
   try {
     const { per_page = 10, page = 1, filter } = req.body;
-    const query = {};
-    const count = await User.countDocuments({});
-    const users = await User.find(query)
+    let query = {};
+    if(filter && filter.role) {
+      query.role = filter.role;
+    }
+    const count = await User.countDocuments(query);
+    const users = await User.find(query).populate("level")
       .skip((page - 1) * per_page)
       .limit(per_page);
     return res.status(200).json({ count: count, rows: users });
