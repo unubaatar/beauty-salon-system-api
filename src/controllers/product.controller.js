@@ -6,7 +6,7 @@ exports.create = async (req, res, next) => {
     if (images.length === 0) {
       return res.status(400).json({ message: "Insert all fields" });
     }
-    if (!name || !description || !images || !price || !stock) {
+    if (!name || !description || !images || !price ) {
       return res.status(400).json({ message: "Insert all fields" });
     }
     const product = new Product(req.body);
