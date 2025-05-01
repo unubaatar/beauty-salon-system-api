@@ -345,7 +345,7 @@ exports.getbyWorker = async (req, res, next) => {
           },
         ],
       });
-    return res.send(schedule);
+    return res.status(200).json(schedule);
   } catch (err) {
     console.log(err);
   }
