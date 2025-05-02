@@ -134,6 +134,7 @@ exports.getLastTenDaysData = async (req, res, next) => {
             totalIncome: totalIncome
         })
       });
+      incomeData = incomeData.reverse();
       return res.status(200).json(incomeData);
     } catch (err) {
       console.log(err);
