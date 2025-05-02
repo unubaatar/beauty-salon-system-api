@@ -134,8 +134,14 @@ exports.list = async (req, res, next) => {
 
 exports.getByCustomer = async (req, res, next) => {
   try {
-    const { customer } = req.body;
-    const foundOrders = await Order.find({ customer: customer })
+    const { customer , state } = req.body;
+    let query = {
+      customer: customer
+    };
+    if(state) {
+      query.state = state;
+    }
+    const foundOrders = await Order.find(query)
       .populate("customer")
       .populate({
         path: "items",

@@ -109,9 +109,9 @@ exports.create = async (req, res, next) => {
     await newTimeReserve.save();
 
     const ioCreateTimeReserve = req.app.get("ioCreateTimeReserve");
-    
+
     console.log("📤 Emitting to room:", `timeReserveCreateRoom:${workerId}`);
-    
+
     ioCreateTimeReserve
       .to(`timeReserveCreateRoom:${workerId}`)
       .emit("timeReserveCreated", newTimeReserve);
@@ -178,8 +178,11 @@ exports.getById = async (req, res, next) => {
 
 exports.getByCustomer = async (req, res, next) => {
   try {
-    const { customerId } = req.body;
-    const foundTimeReserves = await TimeReserve.find({ customer: customerId })
+    const { customerId, state } = req.body;
+    const foundTimeReserves = await TimeReserve.find({
+      customer: customerId,
+      state: state,
+    })
       .populate({
         path: "customer",
         select: "firstName lastName phone email avatar",
@@ -234,7 +237,7 @@ exports.update = async (req, res, next) => {
     const workerId = foundTimeReserve.schedule.worker.toString();
     const ioUpdateTimeReserve = req.app.get("ioUpdateTimeReserve");
 
-    console.log(`timeReserveUpdateRoom:${workerId}`)
+    console.log(`timeReserveUpdateRoom:${workerId}`);
 
     ioUpdateTimeReserve
       .to(`timeReserveUpdateRoom:${workerId}`)
@@ -323,9 +326,12 @@ exports.getByUserReport = async (req, res, next) => {
 
 exports.getbyWorker = async (req, res, next) => {
   try {
-    const { dateTitle  , worker} = req.body;
+    const { dateTitle, worker } = req.body;
 
-    const schedule = await Schedule.findOne({ dateTitle: dateTitle , worker: worker })
+    const schedule = await Schedule.findOne({
+      dateTitle: dateTitle,
+      worker: worker,
+    })
       .select("timeReserves dateTitle worker day")
       .populate({
         path: "timeReserves",
@@ -334,7 +340,7 @@ exports.getbyWorker = async (req, res, next) => {
             path: "services",
             select:
               "services dateTitle startTime totalAmount totalDuration state timeReserveNumber",
-            populate: [ 
+            populate: [
               { path: "service", select: "title image duration" },
               { path: "variant", select: "title duration" },
             ],
