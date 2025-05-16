@@ -48,7 +48,13 @@ exports.login = async (req, res, next) => {
 
     const token = foundUser.getJsonWebToken();
 
-    return res.status(200).json({ user: foundUser, token });
+    const bearerToken = jwt.sign(
+      { id: foundUser._id },
+      process.env.BEARER_KEY,
+      { expiresIn: "1d" }
+    );
+
+    return res.status(200).json({ user: foundUser, token, bearerToken });
   } catch (err) {
     next(err);
   }
@@ -72,11 +78,12 @@ exports.list = async (req, res, next) => {
   try {
     const { per_page = 10, page = 1, filter } = req.body;
     let query = {};
-    if(filter && filter.role) {
+    if (filter && filter.role) {
       query.role = filter.role;
     }
     const count = await User.countDocuments(query);
-    const users = await User.find(query).populate("level")
+    const users = await User.find(query)
+      .populate("level")
       .skip((page - 1) * per_page)
       .limit(per_page);
     return res.status(200).json({ count: count, rows: users });
@@ -109,36 +116,38 @@ exports.getWorkers = async (req, res, next) => {
 
 exports.checkToken = async (req, res, next) => {
   try {
-    const { token } = req.body; 
+    const { token } = req.body;
     if (!token) {
-      return res.status(202).send("Token is missing"); 
+      return res.status(202).send("Token is missing");
     }
     const decoded = jwt.decode(token);
     if (!decoded) {
-      return res.status(401).send("Invalid token"); 
+      return res.status(401).send("Invalid token");
     }
     const expirationTime = decoded.exp;
-    const currentTime = Math.floor(Date.now() / 1000); 
+    const currentTime = Math.floor(Date.now() / 1000);
     if (expirationTime < currentTime) {
-      return res.status(200).json({ valid: false }); 
+      return res.status(200).json({ valid: false });
     }
     return res.status(200).json({ valid: true });
   } catch (err) {
     console.error(err);
-    return next(err); 
+    return next(err);
   }
 };
 
-exports.getById = async(req , res , next) => {
+exports.getById = async (req, res, next) => {
   try {
     const { _id } = req.body;
-    const foundUser = await User.findById(_id).select("firstName lastName avatar role");
-    if(!foundUser) {
+    const foundUser = await User.findById(_id).select(
+      "firstName lastName avatar role"
+    );
+    if (!foundUser) {
       return res.status(404).json({ message: "Not found" });
     }
     return res.status(200).json(foundUser);
-  } catch(err) {
+  } catch (err) {
     console.error(err);
-    return next(err); 
+    return next(err);
   }
-}
+};
