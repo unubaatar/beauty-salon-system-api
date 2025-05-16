@@ -137,23 +137,21 @@ exports.getByDate = async (req, res, next) => {
       .select("-timeRequests")
       .populate({
         path: "worker",
-        select: "firstName lastName phone avatar"
+        select: "firstName lastName phone avatar",
       })
-      .populate(
-        {
-          path: "timeReserves",
-          populate: [
-            {
-              path: "services",
-              populate: "variant service",
-            },
-            {
-              path: "customer",
-              select: "firstName lastName phone",
-            }
-          ]
-        }
-      );
+      .populate({
+        path: "timeReserves",
+        populate: [
+          {
+            path: "services",
+            populate: "variant service",
+          },
+          {
+            path: "customer",
+            select: "firstName lastName phone avatar",
+          },
+        ],
+      });
     return res.status(200).json(schedules);
   } catch (err) {
     console.log(err);
@@ -161,11 +159,10 @@ exports.getByDate = async (req, res, next) => {
   }
 };
 
-exports.getByWorker = async(req , res , next) => {
+exports.getByWorker = async (req, res, next) => {
   try {
-    
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     next(err);
   }
-}
+};
